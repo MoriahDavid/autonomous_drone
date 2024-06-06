@@ -9,7 +9,7 @@ The drone is equipped with distance sensors (left, right, forward, backward), an
 We choose to implement it on the Pygame platform.
 The environment is represented by a 2D map where white pixels represent navigable areas and black pixels represent obstacles. Each pixel corresponds to a 2.5 cm² area. The drone has a radius of 10 cm and sensors with a maximum detection range of 300 cm.
 
-## Sensors and Drone Movement<br />
+### Sensors and Drone Movement<br />
 **The drone uses the following sensors:** <br />
 Distance Sensors: Measure distances in the left, right, forward, and backward directions.<br />
 IMU (Inertial Measurement Unit): Provides the drone's orientation in degrees.<br />
