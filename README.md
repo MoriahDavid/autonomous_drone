@@ -4,15 +4,9 @@
 This project is a simulation of an autonomous drone navigating a 2D environment using various sensors. The goal of the drone is to explore the area as much as possible (it is expressed with yellow coloring) and return to the starting point when the battery level drops to 50%. 🔋 <br /> 
 The drone is equipped with distance sensors (left, right, forward, backward), an orientation sensor (IMU), and an optical flow sensor to aid in navigation and obstacle avoidance.
 
-### Task Description:
-__Part 1:__ Familiarization with the Platform
-The first part of the task involved understanding autonomous drone control and navigation, including the use of various sensors to model the drone's perception of its environment. The focus was on searching for a platform that allows 2D modeling of a structure as sensed by the drone's sensors, given its position and speed. We choose to implement it with Pygame.
-
-__Part 2:__ Developing the Control System
-In the second part of the task, we built a basic control system for the drone. The objective of the control system is to allow the drone to cover as much area as possible. When the battery level reaches 50%, the drone should navigate back to the starting point.
-
 ### Project Implementation:
 **Environment Setup** <br />
+We choose to implement it on the Pygame platform.
 The environment is represented by a 2D map where white pixels represent navigable areas and black pixels represent obstacles. Each pixel corresponds to a 2.5 cm² area. The drone has a radius of 10 cm and sensors with a maximum detection range of 300 cm.
 
 ## Sensors and Drone Movement<br />
@@ -21,6 +15,7 @@ Distance Sensors: Measure distances in the left, right, forward, and backward di
 IMU (Inertial Measurement Unit): Provides the drone's orientation in degrees.<br />
 Optical Flow Sensor: Measures the drone's velocity relative to the ground.<br />
 Battery Sensor: Indicates the remaining battery percentage.<br />
+**In all the sensors we add wrong data by 1% and inaccuracy in values ​​by 2%.**
 <br />
 
 **How It Works?** <br />
