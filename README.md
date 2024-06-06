@@ -70,4 +70,4 @@ This feature allows you to control the drone's movement and orientation directly
 ### How to Run: <br />
 1. Ensure you have Python and Pygame installed.<br />
 2. Place the Maps directory with the required map files in the project directory.<br />
-3. Run the script using: python your_script_name.py<br />
+3. Run the script using: python drone.py<br />
