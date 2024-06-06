@@ -63,3 +63,11 @@ This feature allows you to control the drone's movement and orientation directly
 1. Ensure you have Python and Pygame installed.<br />
 2. Choose a map that you are interested in running from the 'Maps' directory by changing the MAP const in drone.py. <br />
 3. Run the script using: python drone.py. <br />
+
+### Screenshots: <br />
+<img width="1404" alt="image" src="https://github.com/MoriahDavid/autonomous_drone/assets/93945532/e63479cd-cb88-4288-ad42-9ffee6b5d919">
+<img width="1389" alt="image (2)" src="https://github.com/MoriahDavid/autonomous_drone/assets/93945532/e38a259b-e164-4998-ae93-b41f03c42789">
+<img width="1410" alt="image (1)" src="https://github.com/MoriahDavid/autonomous_drone/assets/93945532/c5fc046f-37c2-4a52-be87-62fa67482a3b">
+
+
+
