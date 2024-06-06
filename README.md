@@ -35,19 +35,6 @@ The drone monitors its battery level and returns home when the battery drops to 
 * 🎮 __Manual Control:__ <br /> 
 You can manually control the drone's movement using the arrow keys.<br />
 
-**The drone can perform the following actions:** <br />
-Rotate left or right.<br />
-Move forward or backward.<br />
-Stop movement.<br />
-Stop rotation.<br />
-Autonomous Control<br />
-The drone's control system is implemented in the DroneController class. <br />
-
-**The main functionalities include:** <br />
-Path Planning: The drone adds checkpoints as it navigates the environment.<br />
-Obstacle Avoidance: The drone uses distance sensors to avoid obstacles by adjusting its direction when an obstacle is detected within a certain threshold.<br />
-Returning Home: When the battery level drops to 50%, the drone starts returning to the starting point using the recorded checkpoints. <br />
-
 **Code Structure** <br />
 The code is split into two main classes: Drone and Controller.<br />
 The Drone class is responsible for managing the drone position in the windows, calculating the sensor's values, and displaying the relevant data on the screen. <br />
@@ -60,6 +47,7 @@ The autonomous control function has a few stages -
 - keep to the right - keeping a constant distance from the right wall
 - returning home - rotate the drone to the last checkpoint it visit
 - Stuck in an obstacle - try to move backward and rotate to move away from the obstacle
+<br />
 
 **Manual Control** 🎮<br />
 Changing the manual flag in the drone.py file can change it to manual control. <br />
