@@ -15,7 +15,7 @@ Distance Sensors: Measure distances in the left, right, forward, and backward di
 IMU (Inertial Measurement Unit): Provides the drone's orientation in degrees.<br />
 Optical Flow Sensor: Measures the drone's velocity relative to the ground.<br />
 Battery Sensor: Indicates the remaining battery percentage.<br />
-**In all the sensors we add wrong data by 1% and inaccuracy in values ​​by 2%.**
+**In all the sensors we add wrong data by 1% and inaccuracy in values ​​by 2% and the sensors calculate in frequency of 10 HZ.**
 <br />
 
 **How It Works?** <br />
