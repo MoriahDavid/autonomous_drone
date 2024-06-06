@@ -5,6 +5,9 @@ import random
 import math
 import time
 
+MANUAL = False
+MAP = 'p15.png'
+
 # Initial settings
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -23,7 +26,7 @@ green = (0, 255, 0)
 blue = (0, 0, 128)
 TOTAL_BATTERY_SEC = 8 * 60
 
-MAX_BATTERY_TO_RETURN = 60
+MAX_BATTERY_TO_RETURN = 50
 
 # Sensor characteristics from the provided spreadsheet
 SENSOR_DATA = {
@@ -114,11 +117,6 @@ class Drone:
         if not check_collision(new_x, new_y, map_data):
             self.x = new_x
             self.y = new_y
-            # # Add current position to path if the pixel is not black
-            # self.path.append((self.x, self.y, self.angle,
-            #                   self.sensors_real['right'], self.sensors_real['forward'], self.sensors_real['left']))
-        # else:
-        #     self.vel = 0
 
     def draw(self, win, map_data):
         angle_ofset = -90
@@ -194,7 +192,6 @@ class Drone:
         dy = -math.sin(rad_angle)
 
         # Measure the distance to the nearest obstacle in the given direction
-        # x, y = self.x + DRONE_RADIUS // 2, self.y + DRONE_RADIUS // 2
         x, y = self.x, self.y
         distance = 0
         while 0 <= x < map_data.get_width() and 0 <= y < map_data.get_height() and distance < sensor_specs[
@@ -216,21 +213,18 @@ class Drone:
         return max(sensor_specs['min'], min(distance, sensor_specs['max']))
 
     def rotate_right(self):
-        # self.angular_vel = -self.angular_acc
         if self.angular_vel >= 0:
             self.angular_vel = -self.angular_acc
         else:
             self.angular_vel = max(-self.max_angular_acc, self.angular_vel - self.angular_acc)
 
     def rotate_left(self):
-        # self.angular_vel = self.angular_acc
         if self.angular_vel <= 0:
             self.angular_vel = self.angular_acc
         else:
             self.angular_vel = min(self.max_angular_acc, self.angular_vel + self.angular_acc)
 
     def move_forward(self):
-        # self.vel = self.acc
         if self.vel <= 0:
             self.vel = self.acc
         else:
@@ -257,7 +251,6 @@ class DroneController:
         self.is_turning_180 = False
         self.last_angle = 0
         self.is_returning = False
-        self.actions = []
 
         self.current_x = 0
         self.current_y = 0
@@ -266,8 +259,8 @@ class DroneController:
         self.checkpoint_interval = 50
         self.checkpoints = []
         self.window_checkpoints = []
-        self.dist_from_last_p = 0
         self.should_keep_rotating = False
+        self.fix_collision_step = 0
 
         self.add_checkpoint()
 
@@ -275,8 +268,10 @@ class DroneController:
         self.update_position(self.drone.sensors['imu'], self.drone.sensors['optical_flow'])
         self.step_counter += 1
 
-        # self.handle_keys()
-        self.autonomous_control()
+        if MANUAL:
+            self.handle_keys()
+        else:
+            self.autonomous_control()
 
     def add_checkpoint(self):
         self.checkpoints.append((self.current_x, self.current_y))
@@ -288,7 +283,6 @@ class DroneController:
 
     def handle_keys(self):
         # Handle keyboard input for manual control
-
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.drone.angular_vel = self.drone.angular_acc
@@ -311,7 +305,6 @@ class DroneController:
 
         self.current_x = new_x
         self.current_y = new_y
-        # print(f'x:{new_x} y:{new_y}')
 
     def display_controller_position(self, win):
         font = pygame.font.Font('freesansbold.ttf', 15)
@@ -355,77 +348,6 @@ class DroneController:
                 return True
         return False
 
-    # moriah
-    def navigate_to_position2(self, drone: Drone, target_x, target_y):
-        # Obstacle avoidance
-        front_distance = drone.sensors['forward']
-        backward_distance = drone.sensors['backward']
-        left_distance = drone.sensors['left']
-        right_distance = drone.sensors['right']
-        flow = drone.sensors['optical_flow']
-        orientation = drone.sensors['imu']
-
-        if self.drone.vel > 0 and flow <= 0.5 and \
-                (self.current_x > 5 or self.current_x < -5) and (
-                self.current_y > 5 or self.current_y < -5):  # (self.current_x > 1 or self.current_x < -1) and (self.current_y > 1 or self.current_y < -1):
-            if front_distance > backward_distance:
-                print("collision! -- move_forward")
-                self.drone.move_forward()
-            else:
-                print("collision! -- move_backward")
-                self.drone.move_backward()
-            return
-
-        if 10 < front_distance < 15:  # If there's an obstacle in front
-            print("obstacle in front")
-            # drone.rotate_left()
-            drone.move_backward()
-
-            # if left_distance > right_distance:
-            #     drone.rotate_left()
-            # else:
-            #     drone.rotate_right()
-            # drone.stop()
-            return
-        # else:
-
-        dx = target_x - self.current_x
-        dy = target_y - self.current_y
-        angle_radians = math.atan2(dy, dx)
-        angle_degrees = -math.degrees(angle_radians)
-        if angle_degrees < 0:
-            angle_degrees += 360
-
-        # Rotate the drone
-        if abs((orientation - angle_degrees)) % 360 > 15:  # A small threshold to prevent jitter
-            print("Turing to checkpoint")
-            difference = (angle_degrees - orientation) % 360
-            if difference < 0:
-                difference += 360
-
-            # Determine the shortest turn direction
-            if difference > 180:
-                drone.rotate_right()
-            else:
-                drone.rotate_left()
-            drone.stop()
-        else:
-            print("moving to checkpoint")
-            # Move forward
-            drone.stop_rotation()
-            drone.move_forward()
-
-        # Check if the drone has reached the target
-        distance_to_target = math.dist((target_x, target_y), (self.current_x, self.current_y))
-        if distance_to_target < 10:  # Threshold distance to consider as reached
-            if len(self.checkpoints) > 0:
-                print("Reached checkpoint")
-                self.checkpoints.pop()
-
-            if len(self.checkpoints) == 0:
-                print("Done")
-                self.done_going_home = True  # Reached the starting point
-
     def autonomous_control(self):
         if self.done_going_home:
             return
@@ -438,20 +360,15 @@ class DroneController:
         flow = self.drone.sensors['optical_flow']
         orientation = self.drone.sensors['imu']
 
-        front_threshold = 25
+        front_threshold = 20
         right_far_threshold = 40
         right_threshold = 15
         tunnel_threshold = 60
 
-        if self.drone.vel > 0 and flow <= 0.5 and \
-                (self.current_x > 5 or self.current_x < -5) and (
-                self.current_y > 5 or self.current_y < -5):  #(self.current_x > 1 or self.current_x < -1) and (self.current_y > 1 or self.current_y < -1):
+        if self.step_counter < self.fix_collision_step or (self.drone.vel > 0 and flow <= 0.5):
+            if self.step_counter > self.fix_collision_step:
+                self.fix_collision_step = self.step_counter + 5
 
-            # if distance_forward > distance_backward:
-            #     print("collision! -- move_forward")
-            #     self.drone.move_forward()
-            #     self.drone.rotate_right()
-            # else:
             print("collision! -- move_backward")
             self.drone.move_backward()
             self.drone.rotate_left()
@@ -473,7 +390,7 @@ class DroneController:
 
                 return
 
-            if self.step_counter % 50 or self.should_keep_rotating:
+            if self.step_counter % 70 or self.should_keep_rotating:
                 if self.rotate_to_position(self.drone, dest_x, dest_y):
                     self.should_keep_rotating = True
                 else:
@@ -486,22 +403,11 @@ class DroneController:
             print("Start returning home")
             return
 
-        prev_dist_from_last_p = self.dist_from_last_p
-        self.dist_from_last_p = math.dist((self.current_x, self.current_y), self.checkpoints[len(self.checkpoints) - 1])
-        # if self.dist_from_last_p + 1 < prev_dist_from_last_p:
-        #     self.drone.stop()
-        #     self.drone.rotate_right()
-        #     print("coming back")
-        #     return
-
-
-
         if distance_forward < front_threshold:
             self.drone.stop()
             self.drone.rotate_left()
             print("too close")
 
-        # elif distance_left < tunnel_threshold and distance_right < tunnel_threshold:
         elif distance_left + distance_right < tunnel_threshold:
             print("tunnel mode")
             if distance_left < distance_right - 10:
@@ -522,16 +428,6 @@ class DroneController:
             self.drone.rotate_left()
             self.drone.move_forward()
 
-        # elif distance_left < distance_right:
-        #     print("close left")
-        #     self.drone.rotate_right()
-        #     self.drone.move_forward()
-        #
-        # elif distance_right < distance_left:
-        #     print("close to right")
-        #     self.drone.rotate_left()
-        #     self.drone.move_forward()
-
         else:
             print("forward")
             self.drone.move_forward()
@@ -541,26 +437,16 @@ class DroneController:
             if not self.there_is_close_checkpoint():
                 self.add_checkpoint()
 
-        self.actions.append((self.drone.vel, self.drone.angular_vel))
-
 
 def load_map(map_file):
     return pygame.image.load(map_file)
 
 
 def find_starting_position(map_data):
-    for y in range(20, map_data.get_height() - 20):
-        for x in range(20, map_data.get_width() - 20):
-            collision = False
-            for i in range(DRONE_RADIUS):
-                for j in range(DRONE_RADIUS):
-                    if map_data.get_at((x + i, y + j)) == BLACK:
-                        collision = True
-                        break
-                if collision:
-                    break
-            if not collision:
-                return x + 10, y + 10
+    for y in range(50, map_data.get_height() - 20):
+        for x in range(50, map_data.get_width() - 20):
+            if not check_collision(x, y, map_data):
+                return x, y
     return None, None
 
 
@@ -575,7 +461,7 @@ def check_collision(new_x, new_y, map_data):
 
 def main():
     pygame.init()
-    map_file = os.path.join("Maps", "p12.png")
+    map_file = os.path.join("Maps", MAP)
     black_map_data = load_map(map_file)
     black_map_data.set_colorkey(WHITE)
     map_data = load_map(map_file)
