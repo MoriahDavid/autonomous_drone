@@ -59,6 +59,7 @@ This function is used to navigate the drone to a specified target position while
 The drone uses various sensors to perceive its environment and avoid obstacles, ensuring efficient navigation and exploration.
 
 **Manual Control** 🎮<br />
+Changing the manual-flag in the drone.py file can change it to manual control.<br />
 In addition to its autonomous navigation capabilities, the drone can also be manually controlled using the arrow keys on your keyboard:<br />
 
 ⬆️ Up Arrow: Move the drone forward.<br />
